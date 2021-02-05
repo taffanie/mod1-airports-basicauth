@@ -12,11 +12,10 @@ describe("GET /airports", () => {
       .expect(200, done);
   });
 
-  it("gets all the airports", (done) => {
+  it("gets all the airports - status 200", (done) => {
     request(app)
       .get("/airports")
       .expect(res => {
-        // console.log(res.body.length)
         expect(res.body.length).toBe(28868)
       })
       .expect(200, done);
@@ -30,15 +29,39 @@ describe("GET /airports", () => {
 
 });
 
+describe("GET /airports/pages", () => {
+
+  it("gets 25 airports if no pageSize query param", (done) => {
+    request(app)
+      .get("/airports/pages")
+      .query({ page: 1 })
+      .expect(res => {
+        expect(res.body.length).toBe(25)
+      })
+      .expect(200, done);
+  });
+
+  it("gets 5 airports if pageSize query param is 5", (done) => {
+    request(app)
+      .get("/airports/pages")
+      .query({ page: 1, pageSize: 5 })
+      .expect(res => {
+        expect(res.body.length).toBe(5)
+      })
+      .expect(200, done);
+  });
+
+});
+
 describe("GET /airports/:icao", () => {
 
-  it("gets airport matching the icao", (done) => {
+  it("gets airport matching the icao - status 200", (done) => {
     request(app)
-      .get("/airports/ZUTC")
+      .get("/airports/00AZ")
       .expect(res => {
         // console.log(res.body)
-        expect(res.body.icao).toBe("ZUTC")
-        expect(res.body.state).toBe("Yunnan")
+        expect(res.body.icao).toBe("00AZ")
+        expect(res.body.state).toBe("Arizona")
       })
       .expect(200, done);
   });
@@ -60,14 +83,14 @@ const testAirport = {
 
 describe("POST /airports", () => {
 
-  it("adds new airport", (done) => {
+  it("creates new airport - status 201", (done) => {
     request(app)
       .post("/airports")
       .send(testAirport)
       .expect(res => {
         expect(res.body.icao).toBe(testAirport.icao)
       })
-      .expect(200, done)
+      .expect(201, done)
   });
 
 });
@@ -87,7 +110,7 @@ describe("PUT /airports/:icao", () => {
     tz: 'ABC/ABCDEFG'
   }
 
-  it("updates specified airport", (done) => {
+  it("updates specified airport - status 200", (done) => {
     request(app)
       .put("/airports/" + testAirport.icao)
       .send(updatedTestAirport)
@@ -101,10 +124,10 @@ describe("PUT /airports/:icao", () => {
 
 describe("DELETE /airports/:icao", () => {
 
-  it("deletes specified airport", (done) => {
+  it("deletes specified airport - status 204", (done) => {
     request(app)
       .delete("/airports/" + testAirport.icao)
-      .expect(200, done);
+      .expect(204, done);
   })
 
 })

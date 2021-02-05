@@ -151,7 +151,7 @@ app.get("/airports", (req, res) => {
 })
 
 // Get all airports paginated 
-app.get("/airports", (req, res) => {
+app.get("/airports/pages", (req, res) => {
   let pageSize = 25
   if (req.query.pageSize) {
     pageSize = req.query.pageSize
@@ -159,9 +159,7 @@ app.get("/airports", (req, res) => {
   let currentPage = req.query.page
   let index = (currentPage - 1) * pageSize
   const paginatedAirports = airports.slice(index, pageSize * currentPage)
-  res.send(paginatedAirports);
-  // res.send(airports)
-  console.log(airports.length)
+  res.status(200).send(paginatedAirports);
 });
 
 // ?page=1&pageSize=25
@@ -169,42 +167,41 @@ app.get("/airports", (req, res) => {
 // Get one airport
 app.get("/airports/:icao", (req, res) => {
   const airport = airports.find(airport => airport.icao === req.params.icao)
-  res.send(airport)
+  res.status(200).send(airport)
 })
 
 // Create airport
 app.post("/airports", (req, res) => {
   const newAirport = req.body
   airports.push(newAirport)
-  res.send(newAirport)
+  res.status(201).send(newAirport)
   fs.writeFile('./airports.json', JSON.stringify(airports, null, '\t'), (err) => {
     if (err) throw err;
     console.log('Airport created!')
   })
-  console.log(airports.length)
 })
 
 // Update airport
 app.put("/airports/:icao", (req, res) => {
   const airportIndex = airports.findIndex(airport => airport.icao === req.params.icao)
   airports.splice(airportIndex, 1, req.body)
-  res.send(req.body)
+  res.status(200).send(req.body)
   fs.writeFile('./airports.json', JSON.stringify(airports, null, '\t'), (err) => {
     if (err) throw err;
-    console.log('Airport updated!')
+    // console.log('Airport updated!')
   })
 })
 
 // Delete airport 
 app.delete("/airports/:icao", (req, res) => {
   const airportIndex = airports.findIndex(airport => airport.icao === req.params.icao)
+  const deleteAirport = airports.find(airport => airport.icao === req.params.icao)
   airports.splice(airportIndex, 1)
-  res.send(airports)
+  res.status(204).send(deleteAirport)
   fs.writeFile('./airports.json', JSON.stringify(airports, null, '\t'), (err) => {
     if (err) throw err;
-    console.log('Airport deleted!')
+    // console.log('Airport deleted!')
   })
-  console.log(airports.length)
 })
 
 app.use(
