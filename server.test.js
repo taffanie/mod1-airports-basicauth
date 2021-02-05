@@ -2,6 +2,7 @@ const app = require("./server"); // Link to your server file
 const request = require("supertest");
 const Airports = require("./airports.json");
 
+// Get all airports
 describe("GET /airports", () => {
 
   it("responds with application/json", (done) => {
@@ -29,6 +30,7 @@ describe("GET /airports", () => {
 
 });
 
+// Get all airports paginated
 describe("GET /airports/pages", () => {
 
   it("gets 25 airports if no pageSize query param", (done) => {
@@ -53,6 +55,7 @@ describe("GET /airports/pages", () => {
 
 });
 
+// Get specific airport
 describe("GET /airports/:icao", () => {
 
   it("gets airport matching the icao - status 200", (done) => {
@@ -81,6 +84,7 @@ const testAirport = {
   tz: 'ABC/ABCDEFG'
 }
 
+// Create airport
 describe("POST /airports", () => {
 
   it("creates new airport - status 201", (done) => {
@@ -95,6 +99,7 @@ describe("POST /airports", () => {
 
 });
 
+// Update airport
 describe("PUT /airports/:icao", () => {
 
   const updatedTestAirport = {
@@ -122,6 +127,7 @@ describe("PUT /airports/:icao", () => {
 
 })
 
+// Delete airport
 describe("DELETE /airports/:icao", () => {
 
   it("deletes specified airport - status 204", (done) => {
