@@ -138,5 +138,5 @@ describe("DELETE /airports/:icao", () => {
 
 })
 
-// 200 ok, 201 created, 404 not found
+// 200 ok, 201 created, 204 successful request but no content returned, 404 not found
 // npm run test -- --watchAll

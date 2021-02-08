@@ -1,6 +1,14 @@
 const express = require("express");
 const app = express();
 
+// Middleware
+const basicAuth = require('express-basic-auth');
+const customAuthorizer = require('./users/middleware/customAuthorizer')
+
+// Mongo 
+const mongoose = require('mongoose');
+const createUserController = require('./users/controllers/createUser')
+
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -17,6 +25,38 @@ const swaggerUi = require("swagger-ui-express");
 
 // swagger config
 const swaggerOptions = require("./openapi");
+
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerJsdoc(swaggerOptions), { explorer: true })
+);
+
+// use basic auth and customer middleware function
+app.use(
+  basicAuth({
+    authorizer: customAuthorizer,
+    // challenge: true,
+    // realm: 'Imb4T3st4pp',
+    authorizeAsync: true,
+    unauthorizedResponse: (req) => {
+      console.log(req)
+      return `Sorry, but ${req.auth.user} is not authorised to view this resource`;
+    }
+  })
+);
+
+// connect to mongo
+mongoose.connect(
+  "mongodb://localhost/airportUsers",
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  },
+  () => {
+    console.log("Connected to MongoDB");
+  }
+);
 
 /**
  * @swagger
@@ -204,10 +244,7 @@ app.delete("/airports/:icao", (req, res) => {
   })
 })
 
-app.use(
-  "/api-docs",
-  swaggerUi.serve,
-  swaggerUi.setup(swaggerJsdoc(swaggerOptions), { explorer: true })
-);
+// CREATE
+app.post("/users", createUserController)
 
 module.exports = app;
