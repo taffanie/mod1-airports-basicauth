@@ -36,11 +36,9 @@ app.use(
 app.use(
   basicAuth({
     authorizer: customAuthorizer,
-    // challenge: true,
-    // realm: 'Imb4T3st4pp',
+    challenge: true, // popup in localhost browser asking for username & password
     authorizeAsync: true,
     unauthorizedResponse: (req) => {
-      console.log(req)
       return `Sorry, but ${req.auth.user} is not authorised to view this resource`;
     }
   })
@@ -244,7 +242,7 @@ app.delete("/airports/:icao", (req, res) => {
   })
 })
 
-// CREATE
+// CREATE USER
 app.post("/users", createUserController)
 
 module.exports = app;
