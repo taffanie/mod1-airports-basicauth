@@ -1,0 +1,89 @@
+@startuml
+title: OAuth Flow
+
+actor Customer
+
+group 1 customer authorizes justeat to use fb details
+Customer -> JustEat: Request to sign up 
+note left
+**Sign up form**:
+# Customer goes to JE website
+# Option to sign up with FB 
+end note
+
+JustEat -> Facebook: Authentication Request
+note left
+**GET request**:
+# Client ID
+# Scope (User details)
+# Response type
+# Redirect URI
+end note
+
+Customer <- Facebook: Authentication Request 
+note left
+**FB login**:
+# Email (blank)
+# Password (blank)
+end note
+
+Customer --> Facebook: Authentication Response 
+note left
+**FB login**:
+# Email (filled)
+# Password (filled)
+end note
+
+Customer <- Facebook: Data Permissions Request 
+note left
+**JustEat wants this info**:
+# Name
+# Profile picture
+# Email
+end note
+
+Customer --> Facebook: Data Permissions Response 
+note left
+**Grant JustEat my info**:
+# Name
+# Profile picture
+# Email
+end note
+
+JustEat <-- Facebook: Redirection
+end group 
+
+group 2 justeat requests token from fb 
+JustEat -> Facebook: Token Request
+note left
+**Post Request**:
+# Authorization code sent in header
+# Present authorization grant?
+end note
+
+JustEat <-- Facebook: Token Response 
+note left
+**Access token**:
+# access_token
+# token_type
+# refresh_token
+# expires_in
+end note
+end group
+
+group 3 customer granted access to je 
+
+JustEat -> FacebookAPI: Authorization Request
+note left
+**GET request**:
+# Auth header with access token (Bearer ABC)
+# Host 
+end note
+
+Facebook <- FacebookAPI: Verify Token
+Facebook --> FacebookAPI: Token Verified 
+
+JustEat <-- FacebookAPI: Redirect with signed in customer
+end group
+
+@enduml
