@@ -10,7 +10,6 @@ module.exports = (req, res) => {
         bcrypt.compare(req.body.password, user.password, (err, match) => {
             // use mongo user id as session id
             req.session.user_id = o_id
-            console.log(o_id, req.session.id)
             return res.status(200).send("Logged in")
         })
     }

@@ -39,7 +39,7 @@ app.use(
 // use basic auth and customer middleware function
 const basicAuthOptions = {
   authorizer: customAuthorizer,
-  challenge: true, // popup in localhost browser asking for username & password
+  // challenge: true, // popup in localhost browser asking for username & password
   authorizeAsync: true,
   unauthorizedResponse: (req) => {
     return `Sorry, but ${req.auth.user} is not authorised to view this resource`;
@@ -58,14 +58,14 @@ mongoose.connect(
   }
 );
 
-// sessions 
-const sessionSettings = {
-  secret: "best cohort ever",
-  resave: false,
-  saveUninitialized: true
-}
-app.use(session(sessionSettings))
-
+// init express session
+app.use(
+  session({
+    secret: "abcdefg123",
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 
 /**
  * @swagger
@@ -194,6 +194,8 @@ app.use(session(sessionSettings))
 // Unless you fs.writeFile, will only save in-memory, not permanently in json file 
 // in-memory will reset all airports to default after restart of app 
 
+// --------------- AIRPORT ROUTES ---------------
+
 // Get all airports 
 app.get("/airports", (req, res) => {
   res.status(200).send(airports)
@@ -252,6 +254,8 @@ app.delete("/airports/:icao", (req, res) => {
     // console.log('Airport deleted!')
   })
 })
+
+// --------------- USER ROUTES ---------------
 
 // LOGIN 
 app.post("/login", basicAuth(basicAuthOptions), loginController)
