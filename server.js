@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const session = require('express-session');
 
 // Middleware
 const basicAuth = require('express-basic-auth');
@@ -8,6 +9,9 @@ const customAuthorizer = require('./users/middleware/customAuthorizer')
 // Mongo 
 const mongoose = require('mongoose');
 const createUserController = require('./users/controllers/createUser')
+const readUserController = require('./users/controllers/readUser')
+const loginController = require('./users/controllers/login')
+const logoutController = require('./users/controllers/logout')
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
@@ -33,16 +37,14 @@ app.use(
 );
 
 // use basic auth and customer middleware function
-app.use(
-  basicAuth({
-    authorizer: customAuthorizer,
-    challenge: true, // popup in localhost browser asking for username & password
-    authorizeAsync: true,
-    unauthorizedResponse: (req) => {
-      return `Sorry, but ${req.auth.user} is not authorised to view this resource`;
-    }
-  })
-);
+const basicAuthOptions = {
+  authorizer: customAuthorizer,
+  challenge: true, // popup in localhost browser asking for username & password
+  authorizeAsync: true,
+  unauthorizedResponse: (req) => {
+    return `Sorry, but ${req.auth.user} is not authorised to view this resource`;
+  }
+};
 
 // connect to mongo
 mongoose.connect(
@@ -55,6 +57,15 @@ mongoose.connect(
     console.log("Connected to MongoDB");
   }
 );
+
+// sessions 
+const sessionSettings = {
+  secret: "best cohort ever",
+  resave: false,
+  saveUninitialized: true
+}
+app.use(session(sessionSettings))
+
 
 /**
  * @swagger
@@ -242,7 +253,16 @@ app.delete("/airports/:icao", (req, res) => {
   })
 })
 
+// LOGIN 
+app.post("/login", basicAuth(basicAuthOptions), loginController)
+
+// LOGOUT
+app.get("/logout", logoutController)
+
 // CREATE USER
 app.post("/users", createUserController)
+
+// READ USER
+app.get("/users/:id", readUserController)
 
 module.exports = app;
